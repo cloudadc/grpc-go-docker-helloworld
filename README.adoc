@@ -1,0 +1,45 @@
+= gRPC go HelloWorld
+
+The objective of this repository is quite simple: to recreate the examples from [here](https://github.com/grpc/grpc-go/tree/master/examples/helloworld) in a docker environment running in localhost.
+
+Just execute the following commands:
+
+[source, bash]
+.*1. start server*
+----
+docker run -it --rm --name grpc-server-1 -e PORT=8009 -p 8009:8009 -d cloudadc/grpc-go-greeting:0.1 greeter_server
+docker run -it --rm --name grpc-server-2 -e PORT=8010 -p 8010:8010 -d cloudadc/grpc-go-greeting:0.1 greeter_server
+----
+
+[source, bash]
+.*2. prepare env file*
+----
+$ docker inspect grpc-server-1 | jq ".[0].NetworkSettings.IPAddress"
+"172.17.0.2"
+$ docker inspect grpc-server-2 | jq ".[0].NetworkSettings.IPAddress"
+"172.17.0.3"
+
+$ echo "ADDRESS=172.17.0.2:8009" > list/env-docker-1.list
+$ echo "ADDRESS=172.17.0.3:8010" > list/env-docker-2.list
+----
+
+[source, bash]
+.*3. run client*
+----
+$ docker run --env-file ./list/env-docker-1.list cloudadc/grpc-go-greeting:0.1 greeter_client "kylin SONG"
+2023/02/28 01:21:04 Greeting: Hello kylin SONG
+
+$ docker run --env-file ./list/env-docker-2.list cloudadc/grpc-go-greeting:0.1 greeter_client "kylin SONG"
+2023/02/28 01:21:44 Greeting: Hello kylin SONG
+----
+
+[source, bash]
+.*4. run client with scripts*
+----
+$ docker run --env-file ./list/env-docker-1.list cloudadc/grpc-go-greeting:0.1 greeter_client "This should be blocked <script>evil_script()</script>"
+2023/02/28 01:27:42 Greeting: Hello This should be blocked <script>evil_script()</script>
+
+$ docker run --env-file ./list/env-docker-2.list cloudadc/grpc-go-greeting:0.1 greeter_client "This should be blocked <script>evil_script()</script>"
+2023/02/28 01:28:01 Greeting: Hello This should be blocked <script>evil_script()</script>
+----
+
