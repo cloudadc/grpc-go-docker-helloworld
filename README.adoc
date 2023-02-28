@@ -82,3 +82,57 @@ $ docker run --env-file ./list/env-remote.list cloudadc/grpc-go-greeting:0.1 gre
 image:grpc-go-pcap.png[]
 
 * link:gRPC-go-hello.pcap[]
+
+== NGINX in front of gRPC Server
+
+[source, bash]
+.*1. NGIINX Configration*
+----
+upstream grpcgreeting_service {
+    zone grpcgreeting_service 64k;
+    server 10.1.20.204:8009;
+}
+
+server {
+    listen 8009 http2;
+    status_zone server_grpcgreeting;
+
+    location / {
+        status_zone location_grpcgreeting;
+       # grpc_pass grpc://grpcgreeting_service;
+       grpc_pass 10.1.20.204:8009;
+    }
+}
+----
+
+* link:grpc.conf[grpc.conf]
+
+[source, bash]
+.*2. Start NGINX*
+----
+~]# systemctl restart nginx
+
+~]# netstat -antulop | grep nginx
+tcp        0      0 0.0.0.0:8009            0.0.0.0:*               LISTEN      1948/nginx: master   off (0.00/0/0)
+----
+
+[source, bash]
+.*3. gRPC Client communicate gRPC server via NGINX*
+----
+$ echo "ADDRESS=10.1.20.203:8009" > list/env-nginx.list
+
+$ docker run --env-file ./list/env-nginx.list cloudadc/grpc-go-greeting:0.1 greeter_client
+2023/02/28 02:53:33 Greeting: Hello world
+
+$ docker run --env-file ./list/env-nginx.list cloudadc/grpc-go-greeting:0.1 greeter_client "Kylin SONG"
+2023/02/28 02:58:30 Greeting: Hello Kylin SONG
+
+$ docker run --env-file ./list/env-nginx.list cloudadc/grpc-go-greeting:0.1 greeter_client "his should be blocked <script>evil_script()</script>"
+2023/02/28 03:01:18 Greeting: Hello his should be blocked <script>evil_script()</script>
+---- 
+
+NOTE: The gRPC server run on `10.1.20.204:8009`, the NGINX run on `10.1.20.203:8009`, the gRPC client run on `localhost`.
+
+== NGINX in front of gRPC Server, App Protect Policy on NGINX
+
+* link:policy.json[policy.json]
