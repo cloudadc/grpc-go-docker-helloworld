@@ -1,9 +1,11 @@
-= gRPC go HelloWorld
+= gRPC HelloWorld
 :toc: manual
 
 The objective of this repository is quite simple: to recreate the examples from [here](https://github.com/grpc/grpc-go/tree/master/examples/helloworld) in a docker environment running in localhost.
 
-== Run on Localhost
+== Go
+
+=== Run on Localhost
 
 Just execute the following commands:
 
@@ -46,7 +48,7 @@ $ docker run --env-file ./list/env-docker-2.list cloudadc/grpc-go-greeting:0.1 g
 2023/02/28 01:28:01 Greeting: Hello This should be blocked <script>evil_script()</script>
 ----
 
-== Run on Remote & Capture network packet flow
+=== Run on Remote & Capture network packet flow
 
 [source, bash]
 .*1. start server*
@@ -83,7 +85,7 @@ image:grpc-go-pcap.png[]
 
 * link:gRPC-go-hello.pcap[]
 
-== NGINX in front of gRPC Server
+=== NGINX in front of gRPC Server
 
 [source, bash]
 .*1. NGIINX Configration*
@@ -133,6 +135,14 @@ $ docker run --env-file ./list/env-nginx.list cloudadc/grpc-go-greeting:0.1 gree
 
 NOTE: The gRPC server run on `10.1.20.204:8009`, the NGINX run on `10.1.20.203:8009`, the gRPC client run on `localhost`.
 
-== NGINX in front of gRPC Server, App Protect Policy on NGINX
+=== NGINX in front of gRPC Server, App Protect Policy on NGINX
 
 * link:policy.json[policy.json]
+
+
+== Java
+
+=== Build and Run on Local
+
+
+
