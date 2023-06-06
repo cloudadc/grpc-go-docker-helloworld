@@ -23,6 +23,7 @@ import (
 	"context"
 	"log"
 	"os"
+        "fmt"
 	"time"
 
 	"google.golang.org/grpc"
@@ -30,11 +31,16 @@ import (
 )
 
 const (
-	address     = "10.1.10.205:50051"
-	defaultName = "world"
+	//address     = "localhost:50051"
+	defaultName = "World, What we achieve inwardly will change outer reality."
 )
 
 func main() {
+        if len(os.Args) <= 1 {
+            fmt.Println("Usage: greetings-client [$IP:$PORT]")    
+            os.Exit(1)
+        }
+        address := os.Args[1] 
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -45,8 +51,8 @@ func main() {
 
 	// Contact the server and print out its response.
 	name := defaultName
-	if len(os.Args) > 1 {
-		name = os.Args[1]
+	if len(os.Args) > 2 {
+		name = os.Args[2]
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()

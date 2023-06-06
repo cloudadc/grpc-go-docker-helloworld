@@ -1,4 +1,4 @@
-FROM golang:1.20.4
+FROM arm64v8/golang:1.20.4
 
 LABEL maintainer "kylinsoong.1214@gmail.com"
 
@@ -8,5 +8,7 @@ ADD greeter_server/greetings /app
 ADD greeter_client/greetings-client /app
 
 EXPOSE 50051
+
+ENV PATH=$PATH:/app
 
 CMD ["./greetings"]

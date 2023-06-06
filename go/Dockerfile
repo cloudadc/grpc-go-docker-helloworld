@@ -9,4 +9,6 @@ ADD greeter_client/greetings-client /app
 
 EXPOSE 50051
 
+ENV PATH=$PATH:/app
+
 CMD ["./greetings"]

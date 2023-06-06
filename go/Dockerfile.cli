@@ -4,9 +4,8 @@ LABEL maintainer "kylinsoong.1214@gmail.com"
 
 WORKDIR /app
 
-ADD greeter_server/greetings /app
 ADD greeter_client/greetings-client /app
 
-EXPOSE 50051
+ENV PATH=$PATH:/app
 
-CMD ["./greetings"]
+ENTRYPOINT ["greetings-client"]
