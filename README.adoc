@@ -86,6 +86,42 @@ grpcurl -proto helloworld/helloworld.proto -v -plaintext -d '{"name":"go Tester"
 2023/06/06 04:07:26 Greeting: Hello Go Tester
 ----
 
+=== Run Greetings on Docker(ARM64)
+
+[source, bash]
+.*1. Greeting Server Build(code to image)*
+----
+cd go/greeter_server/
+go mod init cloudadc.github.io/greetings
+go mod tidy
+go build
+cd ../greeter_client/
+go mod init cloudadc.github.io/greetings-client
+go mod tidy
+go build
+
+cd ..
+sudo docker build -t cloudadc/grpc-go-greeting:1.1-aarch64 -f Dockerfile.arm .
+sudo docker push cloudadc/grpc-go-greeting:1.1-aarch64
+----
+
+[source, bash]
+.*2. start server*
+----
+sudo docker run -it --rm --name greetings -p 50051:50051 -d cloudadc/grpc-go-greeting:1.1-aarch64
+----
+
+[source, bash]
+.*3. greetings-client*
+----
+$ sudo docker exec -it greetings greetings-client 127.0.0.1:50051
+2023/06/06 04:31:41 Greeting: Hello World, What we achieve inwardly will change outer reality.
+$ sudo docker exec -it greetings greetings-client 127.0.0.1:50051 "$(uname -a)"
+2023/06/06 04:33:23 Greeting: Hello Linux instance-1 6.1.0-0.deb11.6-cloud-arm64 #1 SMP Debian 6.1.15-1~bpo11+1 (2023-03-16) aarch64 GNU/Linux
+----
+
+=== Run Greetings on K8S
+
 === Run Greetings(Lagecy) on Docker
 
 [source, bash]

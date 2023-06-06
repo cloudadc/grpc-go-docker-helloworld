@@ -27,8 +27,8 @@ target
 .project
 .settings
 
-.sum
-.mod
+*.sum
+*.mod
 
 ### node_modules
 node_modules
