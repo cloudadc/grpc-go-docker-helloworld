@@ -1,9 +1,9 @@
 = gRPC HelloWorld
 :toc: manual
 
-The objective of this repository is quite simple: to recreate the examples from [here](https://github.com/grpc/grpc-go/tree/master/examples/helloworld) in a docker environment running in localhost.
-
 == Go
+
+The original go grpc helloword come from https://github.com/grpc/grpc-go/tree/master/examples/helloworld.
 
 === Run on Localhost
 
