@@ -5,15 +5,76 @@
 
 The original go grpc helloword come from https://github.com/grpc/grpc-go/tree/master/examples/helloworld.
 
-=== Run on Localhost
-
-Just execute the following commands:
+=== Run Source Code on Local
 
 [source, bash]
-.*1. start server*
+.*1. Prepare Environment*
 ----
-docker run -it --rm --name grpc-server-1 -e PORT=8009 -p 8009:8009 -d cloudadc/grpc-go-greeting:0.1 greeter_server
-docker run -it --rm --name grpc-server-2 -e PORT=8010 -p 8010:8010 -d cloudadc/grpc-go-greeting:0.1 greeter_server
+tar -xvf go1.20.4.linux-amd64.tar.gz -C $HOME/.local
+unzip protoc-3.15.8-linux-x86_64.zip -d $HOME/.local
+
+// set PATH
+PATH=$PATH:$HOME/.local/go/bin
+PATH=$PATH:$HOME/.local/bin
+
+// plugin
+go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+----
+
+[source, bash]
+.*2. start server*
+----
+cd grpc-helloworld/go/
+go run greeter_server/main.go 
+----
+
+[source, bash]
+.*3. grpcurl*
+----
+grpcurl -proto helloworld/helloworld.proto -v -plaintext -d '{"name":"go Tester"}' 10.1.10.205:50051 helloworld.Greeter/SayHello
+----
+
+[source, bash]
+.*4. run client*
+----
+# go run greeter_client/main.go "Go Tester"
+2023/06/06 09:40:23 Greeting: Hello Go Tester
+----
+
+=== Run Greetings Server on Docker
+
+[source, bash]
+.*1. Greeting Server Build(code to image)*
+----
+cd go/greeter_server/
+go mod init cloudadc.github.io/greetings
+go mod tidy
+go build
+
+cd ..
+docker build -t cloudadc/grpc-go-greeting:1.0 -f Dockerfile.sev .
+docker push cloudadc/grpc-go-greeting:1.0
+----
+
+[source, bash]
+.*2. start server*
+----
+docker run -it --rm --name greetings -p 50051:50051  cloudadc/grpc-go-greeting:1.0
+----
+
+[source, bash] 
+.*3. grpcurl*
+----
+grpcurl -proto helloworld/helloworld.proto -v -plaintext -d '{"name":"go Tester"}' 10.1.10.205:50051 helloworld.Greeter/SayHello
+----
+
+=== Run Greetings Server on Docker
+
+[source, bash]
+.*1. Greeting Client Build(code to image)*
+----
+
 ----
 
 [source, bash]
